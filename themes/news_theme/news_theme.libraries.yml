@@ -1,0 +1,8 @@
+main:
+  css:
+    theme:
+      css/styles.min.css: { minified: true }
+  js:
+    js/scripts.js: { minified: true }
+  dependencies:
+    - core/jquery
