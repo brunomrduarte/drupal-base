@@ -27,7 +27,7 @@ namespace WebDriver;
  *
  * @package WebDriver
  *
- * @method status
+ * @method array status() Returns information about whether a remote end is in a state in which it can create new sessions.
  */
 class WebDriver extends AbstractWebDriver implements WebDriverInterface
 {
@@ -37,7 +37,7 @@ class WebDriver extends AbstractWebDriver implements WebDriverInterface
     protected function methods()
     {
         return array(
-            'status' => 'GET',
+            'status' => array('GET'),
         );
     }
 

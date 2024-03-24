@@ -4,7 +4,7 @@
  *
  * @author    Stefano Kowalke <blueduck@gmx.net>
  * @copyright 2014 Arroba IT
- * @license   https://github.com/squizlabs/PHP_CodeSniffer/blob/master/licence.txt BSD Licence
+ * @license   https://github.com/PHPCSStandards/PHP_CodeSniffer/blob/master/licence.txt BSD Licence
  */
 
 namespace PHP_CodeSniffer\Generators;
@@ -67,7 +67,7 @@ class Markdown extends Generator
         // don't have their timezone set.
         error_reporting(0);
         echo 'Documentation generated on '.date('r');
-        echo ' by [PHP_CodeSniffer '.Config::VERSION.'](https://github.com/squizlabs/PHP_CodeSniffer)'.PHP_EOL;
+        echo ' by [PHP_CodeSniffer '.Config::VERSION.'](https://github.com/PHPCSStandards/PHP_CodeSniffer)'.PHP_EOL;
 
     }//end printFooter()
 
@@ -84,7 +84,7 @@ class Markdown extends Generator
     protected function processSniff(\DOMNode $doc)
     {
         $title = $this->getTitle($doc);
-        echo "## $title".PHP_EOL;
+        echo PHP_EOL."## $title".PHP_EOL;
 
         foreach ($doc->childNodes as $node) {
             if ($node->nodeName === 'standard') {

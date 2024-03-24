@@ -84,3 +84,9 @@ tmp
 
 # Things in the core directory that Drupal 8 commits in the repository.
 !core/**/*.gz
+
+
+
+vendor
+web/core
+web/sites/default

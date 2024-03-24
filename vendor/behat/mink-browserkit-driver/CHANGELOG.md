@@ -1,3 +1,84 @@
+2.2.0 / 2023-12-09
+==================
+
+New features:
+
+* Added support for Symfony 7.
+* Added types for method parameters
+* Improve the handling of invalid values passed to `setValue`
+
+Testsuite:
+
+* Added CI jobs running on PHP 8.2 and 8.3
+* Added static analysis with phpstan
+
+2.1.0 / 2022-03-28
+==================
+
+New features:
+
+* Added support for Symfony 6.
+
+2.0.0 / 2021-12-13
+==================
+
+BC break:
+
+* The `getClient` method now returns an AbstractBrowser from BrowserKit instead of the deprecated Client.
+* The constructor now takes an AbstractBrowser from BrowserKit instead of the deprecated Client.
+* The deprecated methods `setRemoveHostFromUrl` and `setRemoveScriptFromUrl` have been removed
+
+New features:
+
+* Added support for Symfony 5.
+
+Removed:
+
+* Removed support for Symfony <4.4.
+* Removed support for PHP <7.2.
+* Removed deprecated methods
+
+1.4.1 / 2021-12-10
+==================
+
+Bug fixes:
+
+* Fixed the basic authentication implementation when using Browserkit clients other than the HttpKernel one.
+
+1.4.0 / 2021-10-12
+==================
+
+Removed:
+
+* Removed support for PHP 5.3
+
+Bug fixes:
+
+* Fixed the removal of cookies in a subpath
+
+Testsuite:
+
+* Added CI jobs running on PHP 7.4, 8.0 and 8.1
+
+1.3.4 / 2020-03-11
+==================
+
+BC Break:
+
+* Changed the return value for `getValue` on a select without any options to an empty string rather than `null` to respect the common contract between Mink drivers
+
+Bug fixes:
+
+* Changed phpdoc types from `Boolean` to `boolean` to be compatible with psalm type checking
+* Improved compatibility with the HTML5 parsing of the symfony/dom-crawler component in 4.4+
+* Removed usages of APIs deprecated in symfony/dom-crawler 4.4
+* Send the configured headers when submitting forms
+
+Testsuite:
+
+* Removed HHVM from CI as they dropped support for PHP compatibility
+* Added CI on PHP 7.2, 7.3 and 7.4
+
 1.3.3 / 2018-05-02
 ==================
 

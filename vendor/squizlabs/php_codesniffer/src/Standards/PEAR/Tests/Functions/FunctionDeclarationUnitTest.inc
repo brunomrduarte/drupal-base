@@ -314,3 +314,177 @@ if(true) {
         ;
     }
 }
+
+class ConstructorPropertyPromotionSingleLineDocblockIndentOK
+{
+    public function __construct(
+        /** @var string */
+        public string $public,
+        /** @var string */
+        private string $private,
+    ) {
+    }
+}
+
+class ConstructorPropertyPromotionMultiLineDocblockAndAttributeIndentOK
+{
+    public function __construct(
+        /**
+         * @var string
+         * @Assert\NotBlank()
+         */
+        public string $public,
+        /**
+         * @var string
+         * @Assert\NotBlank()
+         */
+        #[NotBlank]
+        private string $private,
+    ) {
+    }
+}
+
+class ConstructorPropertyPromotionSingleLineDocblockIncorrectIndent
+{
+    public function __construct(
+      /** @var string */
+      public string $public,
+          /** @var string */
+          private string $private,
+    ) {
+    }
+}
+
+class ConstructorPropertyPromotionMultiLineDocblockAndAttributeIncorrectIndent
+{
+    public function __construct(
+    /**
+     * @var string
+     * @Assert\NotBlank()
+     */
+    public string $public,
+/**
+ * @var string
+ * @Assert\NotBlank()
+ */
+#[NotBlank]
+private string $private,
+    ) {
+    }
+}
+
+class ConstructorPropertyPromotionMultiLineAttributesOK
+{
+    public function __construct(
+        #[ORM\ManyToOne(
+            Something: true,
+            SomethingElse: 'text',
+        )]
+        #[Groups([
+            'ArrayEntry',
+            'Another.ArrayEntry',
+        ])]
+        #[MoreGroups(
+            [
+                'ArrayEntry',
+                'Another.ArrayEntry',
+            ]
+        )]
+        private Type $property
+    ) {
+        // Do something.
+    }
+}
+
+class ConstructorPropertyPromotionMultiLineAttributesIncorrectIndent
+{
+    public function __construct(
+    #[ORM\ManyToOne(
+        Something: true,
+        SomethingElse: 'text',
+    )]
+            #[Groups([
+                'ArrayEntry',
+                'Another.ArrayEntry',
+            ])]
+        #[MoreGroups(
+    [
+        'ArrayEntry',
+        'Another.ArrayEntry',
+    ]
+        )]
+        private Type $property
+    ) {
+        // Do something.
+    }
+}
+
+// PHP 8.1: new in initializers means that class instantiations with parameters can occur in a function declaration.
+function usingNewInInitializersCallParamsIndented(
+    int $paramA,
+    string $paramB,
+    object $paramC = new SomeClass(
+        new InjectedDependencyA(),
+        new InjectedDependencyB
+    )
+) {}
+
+function usingNewInInitializersCallParamsNotIndented(
+    int $paramA,
+    string $paramB,
+    object $paramC = new SomeClass(
+    new InjectedDependencyA,
+    new InjectedDependencyB()
+    )
+) {}
+
+function usingNewInInitializersCallParamsIncorrectlyIndentedShouldNotBeFlaggedNorFixed(
+    int $paramA,
+    string $paramB,
+    object $paramC = new SomeClass(
+new InjectedDependencyA(), new InjectedDependencyB()
+)
+) {}
+
+class UsingNewInInitializers {
+    public function doSomething(
+        object $paramA,
+        stdClass $paramB = new stdClass(),
+        Exception $paramC = new Exception(
+            new ExceptionMessage(),
+            new ExceptionCode(),
+        ),
+    ) {
+    }
+
+    public function callParamsIncorrectlyIndentedShouldNotBeFlaggedNorFixed(
+        Exception $param = new Exception(
+new ExceptionMessage(),
+    new ExceptionCode(),
+  ),
+    ) {
+    }
+}
+
+// Issue #3736 - prevent the fixer creating a parse error by removing the function close brace.
+class Test
+{
+    public function __construct(
+        protected int $id
+    )
+    {}
+}
+
+// Prevent fixer conflict with itself.
+function foo(
+    $param1,
+)
+: \SomeClass
+  {
+  }
+
+function foo(
+    $param1,
+    $param2
+) : // comment.
+   \Package\Sub\SomeClass   {}

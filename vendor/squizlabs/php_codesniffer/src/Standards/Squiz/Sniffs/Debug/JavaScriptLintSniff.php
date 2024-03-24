@@ -4,7 +4,9 @@
  *
  * @author    Greg Sherwood <gsherwood@squiz.net>
  * @copyright 2006-2015 Squiz Pty Ltd (ABN 77 084 670 600)
- * @license   https://github.com/squizlabs/PHP_CodeSniffer/blob/master/licence.txt BSD Licence
+ * @license   https://github.com/PHPCSStandards/PHP_CodeSniffer/blob/master/licence.txt BSD Licence
+ *
+ * @deprecated 3.9.0
  */
 
 namespace PHP_CodeSniffer\Standards\Squiz\Sniffs\Debug;
@@ -13,6 +15,7 @@ use PHP_CodeSniffer\Config;
 use PHP_CodeSniffer\Exceptions\RuntimeException;
 use PHP_CodeSniffer\Files\File;
 use PHP_CodeSniffer\Sniffs\Sniff;
+use PHP_CodeSniffer\Util\Common;
 
 class JavaScriptLintSniff implements Sniff
 {
@@ -28,7 +31,7 @@ class JavaScriptLintSniff implements Sniff
     /**
      * Returns the token types that this sniff is interested in.
      *
-     * @return int[]
+     * @return array<int|string>
      */
     public function register()
     {
@@ -44,19 +47,19 @@ class JavaScriptLintSniff implements Sniff
      * @param int                         $stackPtr  The position in the stack where
      *                                               the token was found.
      *
-     * @return void
+     * @return int
      * @throws \PHP_CodeSniffer\Exceptions\RuntimeException If Javascript Lint ran into trouble.
      */
     public function process(File $phpcsFile, $stackPtr)
     {
         $jslPath = Config::getExecutablePath('jsl');
         if ($jslPath === null) {
-            return;
+            return ($phpcsFile->numTokens + 1);
         }
 
         $fileName = $phpcsFile->getFilename();
 
-        $cmd = '"'.escapeshellcmd($jslPath).'" -nologo -nofilelisting -nocontext -nosummary -output-format __LINE__:__ERROR__ -process '.escapeshellarg($fileName);
+        $cmd = '"'.Common::escapeshellcmd($jslPath).'" -nologo -nofilelisting -nocontext -nosummary -output-format __LINE__:__ERROR__ -process '.escapeshellarg($fileName);
         $msg = exec($cmd, $output, $retval);
 
         // Variable $exitCode is the last line of $output if no error occurs, on

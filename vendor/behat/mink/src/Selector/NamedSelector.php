@@ -19,6 +19,9 @@ use Behat\Mink\Selector\Xpath\Escaper;
  */
 class NamedSelector implements SelectorInterface
 {
+    /**
+     * @var array<string, string>
+     */
     private $replacements = array(
         // simple replacements
         '%lowercaseType%' => "translate(./@type, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')",
@@ -48,6 +51,9 @@ class NamedSelector implements SelectorInterface
         '%imgAltMatch%' => './/img[%altMatch%]',
     );
 
+    /**
+     * @var array<string, string>
+     */
     private $selectors = array(
         'fieldset' => <<<XPATH
 .//fieldset
@@ -159,6 +165,9 @@ XPATH
 .//*[%idOrNameMatch%]
 XPATH
     );
+    /**
+     * @var Escaper
+     */
     private $xpathEscaper;
 
     /**
@@ -169,11 +178,11 @@ XPATH
         $this->xpathEscaper = new Escaper();
 
         foreach ($this->replacements as $from => $to) {
-            $this->replacements[$from] = strtr($to, $this->replacements);
+            $this->registerReplacement($from, $to);
         }
 
         foreach ($this->selectors as $alias => $selector) {
-            $this->selectors[$alias] = strtr($selector, $this->replacements);
+            $this->registerNamedXpath($alias, $selector);
         }
     }
 
@@ -182,10 +191,12 @@ XPATH
      *
      * @param string $name  name for selector
      * @param string $xpath xpath expression
+     *
+     * @return void
      */
-    public function registerNamedXpath($name, $xpath)
+    public function registerNamedXpath(string $name, string $xpath)
     {
-        $this->selectors[$name] = $xpath;
+        $this->selectors[$name] = strtr($xpath, $this->replacements);
     }
 
     /**
@@ -229,19 +240,37 @@ XPATH
     }
 
     /**
-     * Registers a replacement in the list of replacements.
+     * Register a string replacement used to reduce duplication and increase readability in a Named XPath selector.
      *
-     * This method must be called in the constructor before calling the parent constructor.
+     * Replacements can make use of other replacements but any consumed replacement must have already been defined
+     * beforehand.
      *
-     * @param string $from
-     * @param string $to
+     * For example you may have the following translations:
+     *
+     *      %idMatch%           => ./@id = %locator%
+     *      %idOrNameMatch%     => (%idMatch% or ./@name = %locator%)
+     *
+     * Because the %idOrNameMatch% replacement consumes the %idMatch% replacement, it must be defined afterwards.
+     *
+     * You may then use this in a Named XPath:
+     *
+     *     .//fieldset[%idOrNameMatch%]
+     *
+     * And it would be translated to:
+     *
+     *     .//fieldset[(./@id = %locator% or /@name = %locator%)]
+     *
+     * @param string $from The source, typically a string wrapped in % markers
+     * @param string $to The translation
+     *
+     * @return void
      */
-    protected function registerReplacement($from, $to)
+    public function registerReplacement(string $from, string $to)
     {
-        $this->replacements[$from] = $to;
+        $this->replacements[$from] = strtr($to, $this->replacements);
     }
 
-    private function escapeLocator($locator)
+    private function escapeLocator(string $locator): string
     {
         // If the locator looks like an escaped one, don't escape it again for BC reasons.
         if (

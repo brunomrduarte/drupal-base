@@ -9,7 +9,7 @@
  *
  * @author    Greg Sherwood <gsherwood@squiz.net>
  * @copyright 2006-2015 Squiz Pty Ltd (ABN 77 084 670 600)
- * @license   https://github.com/squizlabs/PHP_CodeSniffer/blob/master/licence.txt BSD Licence
+ * @license   https://github.com/PHPCSStandards/PHP_CodeSniffer/blob/master/licence.txt BSD Licence
  */
 
 namespace PHP_CodeSniffer\Files;
@@ -38,7 +38,7 @@ class DummyFile extends File
         // This is done by including: phpcs_input_file: [file path]
         // as the first line of content.
         $path = 'STDIN';
-        if ($content !== null) {
+        if ($content !== '') {
             if (substr($content, 0, 17) === 'phpcs_input_file:') {
                 $eolPos   = strpos($content, $this->eolChar);
                 $filename = trim(substr($content, 17, ($eolPos - 17)));

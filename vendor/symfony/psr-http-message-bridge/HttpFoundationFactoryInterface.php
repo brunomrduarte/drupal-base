@@ -25,19 +25,11 @@ interface HttpFoundationFactoryInterface
 {
     /**
      * Creates a Symfony Request instance from a PSR-7 one.
-     *
-     * @param ServerRequestInterface $psrRequest
-     *
-     * @return Request
      */
-    public function createRequest(ServerRequestInterface $psrRequest);
+    public function createRequest(ServerRequestInterface $psrRequest, bool $streamed = false): Request;
 
     /**
      * Creates a Symfony Response instance from a PSR-7 one.
-     *
-     * @param ResponseInterface $psrResponse
-     *
-     * @return Response
      */
-    public function createResponse(ResponseInterface $psrResponse);
+    public function createResponse(ResponseInterface $psrResponse, bool $streamed = false): Response;
 }

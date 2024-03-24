@@ -6,7 +6,7 @@
  *
  * @author    Greg Sherwood <gsherwood@squiz.net>
  * @copyright 2006-2015 Squiz Pty Ltd (ABN 77 084 670 600)
- * @license   https://github.com/squizlabs/PHP_CodeSniffer/blob/master/licence.txt BSD Licence
+ * @license   https://github.com/PHPCSStandards/PHP_CodeSniffer/blob/master/licence.txt BSD Licence
  */
 
 namespace PHP_CodeSniffer\Files;
@@ -16,6 +16,7 @@ use PHP_CodeSniffer\Util;
 use PHP_CodeSniffer\Ruleset;
 use PHP_CodeSniffer\Config;
 use PHP_CodeSniffer\Exceptions\DeepExitException;
+use ReturnTypeWillChange;
 
 class FileList implements \Iterator, \Countable
 {
@@ -169,6 +170,7 @@ class FileList implements \Iterator, \Countable
      *
      * @return void
      */
+    #[ReturnTypeWillChange]
     public function rewind()
     {
         reset($this->files);
@@ -181,10 +183,11 @@ class FileList implements \Iterator, \Countable
      *
      * @return \PHP_CodeSniffer\Files\File
      */
+    #[ReturnTypeWillChange]
     public function current()
     {
         $path = key($this->files);
-        if ($this->files[$path] === null) {
+        if (isset($this->files[$path]) === false) {
             $this->files[$path] = new LocalFile($path, $this->ruleset, $this->config);
         }
 
@@ -196,8 +199,9 @@ class FileList implements \Iterator, \Countable
     /**
      * Return the file path of the current file being processed.
      *
-     * @return void
+     * @return string|null Path name or `null` when the end of the iterator has been reached.
      */
+    #[ReturnTypeWillChange]
     public function key()
     {
         return key($this->files);
@@ -210,6 +214,7 @@ class FileList implements \Iterator, \Countable
      *
      * @return void
      */
+    #[ReturnTypeWillChange]
     public function next()
     {
         next($this->files);
@@ -222,6 +227,7 @@ class FileList implements \Iterator, \Countable
      *
      * @return boolean
      */
+    #[ReturnTypeWillChange]
     public function valid()
     {
         if (current($this->files) === false) {
@@ -238,6 +244,7 @@ class FileList implements \Iterator, \Countable
      *
      * @return integer
      */
+    #[ReturnTypeWillChange]
     public function count()
     {
         return $this->numFiles;

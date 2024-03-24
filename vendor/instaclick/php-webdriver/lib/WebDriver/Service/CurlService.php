@@ -23,7 +23,7 @@
 
 namespace WebDriver\Service;
 
-use WebDriver\Exception as WebDriverException;
+use WebDriver\Exception\CurlExec as CurlExecException;
 
 /**
  * WebDriver\Service\CurlService class
@@ -38,8 +38,8 @@ class CurlService implements CurlServiceInterface
     public function execute($requestMethod, $url, $parameters = null, $extraOptions = array())
     {
         $customHeaders = array(
-            'Content-Type: application/json;charset=UTF-8',
-            'Accept: application/json;charset=UTF-8',
+            'Content-Type: application/json;charset=utf-8',
+            'Accept: application/json',
         );
 
         $curl = curl_init($url);
@@ -50,56 +50,39 @@ class CurlService implements CurlServiceInterface
                 break;
 
             case 'POST':
-                if ($parameters && is_array($parameters)) {
-                    curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($parameters));
-                } else {
-                    $customHeaders[] = 'Content-Length: 0';
+            case 'PUT':
+                $parameters = ! $parameters || ! is_array($parameters)
+                    ? '{}' // instead of json_encode(new \stdclass))
+                    : json_encode($parameters);
 
-                    // Suppress "Transfer-Encoding: chunked" header automatically added by cURL that
-                    // causes a 400 bad request (bad content-length).
-                    $customHeaders[] = 'Transfer-Encoding:';
-                }
+                curl_setopt($curl, CURLOPT_POSTFIELDS, $parameters);
 
                 // Suppress "Expect: 100-continue" header automatically added by cURL that
                 // causes a 1 second delay if the remote server does not support Expect.
                 $customHeaders[] = 'Expect:';
 
-                curl_setopt($curl, CURLOPT_POST, true);
+                $requestMethod === 'POST'
+                    ? curl_setopt($curl, CURLOPT_POST, true)
+                    : curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'PUT');
                 break;
 
             case 'DELETE':
                 curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'DELETE');
                 break;
-
-            case 'PUT':
-                if ($parameters && is_array($parameters)) {
-                    curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($parameters));
-                } else {
-                    $customHeaders[] = 'Content-Length: 0';
-
-                    // Suppress "Transfer-Encoding: chunked" header automatically added by cURL that
-                    // causes a 400 bad request (bad content-length).
-                    $customHeaders[] = 'Transfer-Encoding:';
-                }
-
-                // Suppress "Expect: 100-continue" header automatically added by cURL that
-                // causes a 1 second delay if the remote server does not support Expect.
-                $customHeaders[] = 'Expect:';
-
-                curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'PUT');
-                break;
         }
+
+        curl_setopt($curl, CURLOPT_HTTPHEADER, $customHeaders);
 
         foreach ($extraOptions as $option => $value) {
             curl_setopt($curl, $option, $value);
         }
 
-        curl_setopt($curl, CURLOPT_HTTPHEADER, $customHeaders);
-
         $rawResult = trim(curl_exec($curl));
 
         $info = curl_getinfo($curl);
         $info['request_method'] = $requestMethod;
+        $info['errno'] = curl_errno($curl);
+        $info['error'] = curl_error($curl);
 
         if (array_key_exists(CURLOPT_FAILONERROR, $extraOptions) &&
             $extraOptions[CURLOPT_FAILONERROR] &&
@@ -108,8 +91,7 @@ class CurlService implements CurlServiceInterface
         ) {
             curl_close($curl);
 
-            throw WebDriverException::factory(
-                WebDriverException::CURL_EXEC,
+            $e = new CurlExecException(
                 sprintf(
                     "Curl error thrown for http %s to %s%s\n\n%s",
                     $requestMethod,
@@ -117,10 +99,12 @@ class CurlService implements CurlServiceInterface
                     $parameters && is_array($parameters) ? ' with params: ' . json_encode($parameters) : '',
                     $error
                 ),
-                $errno,
-                null,
-                $info
+                $errno
             );
+
+            $e->setCurlInfo($info);
+
+            throw $e;
         }
 
         curl_close($curl);
