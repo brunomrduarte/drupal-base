@@ -90,3 +90,5 @@ tmp
 vendor/*
 web/core
 web/sites/default
+web/modules/contrib
+web/themes/contrib
