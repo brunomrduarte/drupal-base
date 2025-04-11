@@ -1,30 +1,25 @@
 name: drupal-base
-recipe: drupal10
+recipe: drupal11
 config:
-  php: 8.1
+  php: 8.3
   webroot: web
-  config:
-    php: lando/config/php.ini
-  services:
-    node:
-      type: node
-      globals:
-        gulp: "latest"
-      build:
-        - npm install
+  databse: mysql:8.0.22
+
 services:
-  appserver:
-    composer_version: "2.6.5"
-    config:
-      php: lando/config/php.ini
-    overrides:
-      environment:
-        PHP_IDE_CONFIG: "serverName=appserver"
+  database:
+    creds:
+      database: drupal
+      password: drupal
+      user: drupal
+  node:
+    type: node
+    globals:
+      gulp: latest
+    build:
+      - npm install
+
 tooling:
-  composer:
-    service: appserver
-    cmd: php /usr/local/bin/composer
-  yarn:
+  npm:
     service: node
   node:
     service: node
